@@ -4,11 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import * as OTPAuth from "otpauth";
 import type { TOTPAccount } from "@/types";
 
-const SERVICE_BADGE: Record<string, string> = {
-  aws: "bg-orange-100 text-orange-700",
-  github: "bg-slate-800 text-white",
-  google: "bg-blue-100 text-blue-700",
-  other: "bg-slate-100 text-slate-600",
+const INITIAL_STYLE: Record<string, string> = {
+  aws:    "bg-orange-500/20 text-orange-300",
+  github: "bg-white/10 text-white",
+  google: "bg-blue-500/20 text-blue-300",
+  other:  "bg-indigo-500/20 text-indigo-300",
 };
 
 export default function OTPCard({ name, secret, issuer, service }: TOTPAccount) {
@@ -46,61 +46,75 @@ export default function OTPCard({ name, secret, issuer, service }: TOTPAccount) 
   const copyOTP = async () => {
     await navigator.clipboard.writeText(otp);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 1800);
   };
 
-  const isExpiring = timeRemaining <= 5;
+  const isExpiring = timeRemaining <= 7;
   const progress = (timeRemaining / 30) * 100;
-  const badgeClass = SERVICE_BADGE[service] ?? SERVICE_BADGE.other;
+  const initStyle = INITIAL_STYLE[service] ?? INITIAL_STYLE.other;
 
   return (
-    <div className="bg-[var(--ios-surface)] rounded-3xl border border-[var(--ios-border)] p-5 shadow-[0_8px_24px_rgba(15,23,42,0.07)] animate-in zoom-in-95">
+    <div className="card card-hover animate-in p-5 flex flex-col gap-4 transition-all duration-200">
+
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-sm shrink-0">
+      <div className="flex items-center gap-3">
+        <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-bold text-lg shrink-0 ${initStyle}`}>
           {issuer.charAt(0).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-0.5">
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full uppercase tracking-wide ${badgeClass}`}>
-              {service}
-            </span>
-          </div>
-          <p className="text-slate-900 font-semibold text-sm leading-tight">{issuer}</p>
-          <p className="text-slate-400 text-xs truncate">{name}</p>
+          <p className="font-semibold text-sm truncate" style={{ color: "var(--text)" }}>{issuer}</p>
+          <p className="text-xs truncate mt-0.5" style={{ color: "var(--text-secondary)" }}>{name}</p>
         </div>
       </div>
 
-      {/* OTP Button */}
+      {/* OTP display */}
       <button
         onClick={copyOTP}
-        className="w-full py-3 px-4 bg-[var(--ios-surface-alt)] rounded-2xl mb-3 transition-all active:scale-[0.98] border border-transparent hover:border-[var(--ios-border)]"
+        className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
+        style={{
+          background: "rgba(0,0,0,0.3)",
+          border: `1px solid ${isExpiring ? "rgba(251,191,36,0.2)" : "var(--border)"}`,
+        }}
       >
         {copied ? (
-          <span className="flex items-center justify-center gap-2 text-emerald-500 font-semibold text-sm">
+          <span className="flex items-center justify-center gap-2 text-sm font-semibold"
+                style={{ color: "#4ade80" }}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
             Copied!
           </span>
         ) : (
-          <span className={`font-code text-2xl font-semibold tracking-[0.25em] ${isExpiring ? "text-amber-500 animate-pulse" : "text-slate-900"}`}>
-            {otp.slice(0, 3)} {otp.slice(3)}
+          <span
+            className="font-code text-3xl font-bold tracking-[0.3em]"
+            style={{ color: isExpiring ? "#fbbf24" : "var(--text)" }}
+          >
+            {otp.slice(0, 3)}&thinsp;{otp.slice(3)}
           </span>
         )}
       </button>
 
-      {/* Progress */}
-      <div>
-        <div className="flex justify-between text-xs text-slate-400 mb-1">
-          <span>Expires in</span>
-          <span className={isExpiring ? "text-amber-500 font-medium" : ""}>{timeRemaining}s</span>
-        </div>
-        <div className="h-1 bg-slate-200 rounded-full overflow-hidden">
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="h-1 rounded-full overflow-hidden" style={{ background: "var(--surface-alt)" }}>
           <div
-            className={`h-full rounded-full transition-all duration-1000 ease-linear ${isExpiring ? "bg-amber-400" : "bg-slate-900"}`}
-            style={{ width: `${progress}%` }}
+            className="h-full rounded-full transition-all duration-1000 ease-linear"
+            style={{
+              width: `${progress}%`,
+              background: isExpiring
+                ? "linear-gradient(90deg, #f59e0b, #ef4444)"
+                : "var(--accent)",
+            }}
           />
+        </div>
+        <div className="flex justify-between">
+          <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>tap to copy</span>
+          <span
+            className="text-[10px] font-medium tabular-nums"
+            style={{ color: isExpiring ? "#fbbf24" : "var(--text-muted)" }}
+          >
+            {timeRemaining}s
+          </span>
         </div>
       </div>
     </div>

@@ -32,42 +32,55 @@ export default function CredentialGrid({ credentials }: CredentialGridProps) {
     <div className="space-y-5">
       {/* Search */}
       <div className="relative">
+        <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+             style={{ color: "var(--text-muted)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name, service, or tag..."
-          className="w-full px-4 py-3 bg-[var(--ios-surface)] border border-[var(--ios-border)] rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900"
+          placeholder="Search credentials..."
+          className="input-dark w-full pl-11 pr-10"
         />
         {query && (
-          <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600">
+          <button onClick={() => setQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs px-2 py-0.5 rounded-md transition-colors"
+                  style={{ color: "var(--text-muted)", background: "var(--surface-hover)" }}>
             Clear
           </button>
         )}
       </div>
 
       {/* Service filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {usedServices.map((svc) => (
-          <button
-            key={svc}
-            onClick={() => setServiceFilter(svc)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              serviceFilter === svc
-                ? "bg-slate-900 text-white"
-                : "bg-[var(--ios-surface)] border border-[var(--ios-border)] text-slate-600 hover:bg-[var(--ios-surface-alt)]"
-            }`}
-          >
-            {svc === "all" ? `All (${credentials.length})` : svc}
-          </button>
-        ))}
+      <div className="flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {usedServices.map((svc) => {
+          const active = serviceFilter === svc;
+          return (
+            <button
+              key={svc}
+              onClick={() => setServiceFilter(svc)}
+              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+              style={{
+                background: active ? "var(--accent-soft)" : "var(--surface)",
+                border: `1px solid ${active ? "rgba(99,102,241,0.35)" : "var(--border)"}`,
+                color: active ? "var(--accent-hover)" : "var(--text-secondary)",
+              }}
+            >
+              {svc === "all" ? `All · ${credentials.length}` : svc}
+            </button>
+          );
+        })}
       </div>
 
-      <p className="text-xs text-slate-400">{filtered.length} of {credentials.length} credentials</p>
+      {/* Count */}
+      <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+        {filtered.length} of {credentials.length} credentials
+      </p>
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-slate-400">
+        <div className="flex flex-col items-center justify-center py-20" style={{ color: "var(--text-muted)" }}>
           <p className="text-sm">No results found.</p>
         </div>
       ) : (

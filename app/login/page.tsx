@@ -25,7 +25,6 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
       router.push("/dashboard");
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -34,64 +33,70 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.08) 0%, var(--bg) 60%)" }}>
+      <div className="w-full max-w-sm">
+        {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-900 mb-4 shadow-[0_12px_30px_rgba(15,23,42,0.25)]">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+               style={{ background: "var(--accent-soft)", border: "1px solid rgba(99,102,241,0.2)" }}>
+            <svg className="w-8 h-8" style={{ color: "var(--accent-hover)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                 d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900 mb-1">p.secret</h1>
-          <p className="text-slate-500 text-sm">Key vault & authenticator</p>
+          <h1 className="text-2xl font-semibold" style={{ color: "var(--text)" }}>anla secret</h1>
+          <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>Key vault & authenticator</p>
         </div>
 
-        <div className="bg-[var(--ios-surface)] rounded-3xl border border-[var(--ios-border)] p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Card */}
+        <div className="card p-7 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 text-rose-600 text-sm text-center animate-shake">
+              <div className="animate-shake rounded-xl px-4 py-3 text-sm text-center"
+                   style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}>
                 {error}
               </div>
             )}
+
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
-                Username
-              </label>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Username</label>
               <input
                 id="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-[var(--ios-surface-alt)] border border-[var(--ios-border)] rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
-                placeholder="Username"
+                className="input-dark w-full"
+                placeholder="Enter username"
                 required
                 autoComplete="username"
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                Password
-              </label>
+              <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--text-secondary)" }}>Password</label>
               <input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-[var(--ios-surface-alt)] border border-[var(--ios-border)] rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 transition-all"
-                placeholder="Password"
+                className="input-dark w-full"
+                placeholder="Enter password"
                 required
                 autoComplete="current-password"
               />
             </div>
+
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-slate-900 text-white font-semibold rounded-2xl hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 rounded-2xl text-sm font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              style={{ background: "var(--accent)" }}
+              onMouseEnter={e => !isLoading && ((e.target as HTMLElement).style.background = "var(--accent-hover)")}
+              onMouseLeave={e => ((e.target as HTMLElement).style.background = "var(--accent)")}
             >
               {isLoading ? (
                 <span className="inline-flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
@@ -101,6 +106,10 @@ export default function LoginPage() {
             </button>
           </form>
         </div>
+
+        <p className="text-center text-xs mt-6" style={{ color: "var(--text-muted)" }}>
+          Personal vault — access restricted
+        </p>
       </div>
     </div>
   );

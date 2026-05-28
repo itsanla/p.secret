@@ -17,43 +17,47 @@ export default function DashboardClient({ credentials, totpAccounts }: Dashboard
   const [tab, setTab] = useState<Tab>("vault");
 
   return (
-    <div className="min-h-screen text-slate-900">
-      <header className="sticky top-0 z-40 bg-[var(--ios-surface-alpha)] backdrop-blur-xl border-b border-[var(--ios-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 gap-4">
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-sm">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+    <div className="min-h-screen">
+      {/* Header */}
+      <header className="sticky top-0 z-40"
+              style={{ background: "rgba(8,9,14,0.85)", backdropFilter: "blur(16px)", borderBottom: "1px solid var(--border)" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14 gap-4">
+
+            {/* Logo */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                   style={{ background: "var(--accent-soft)", border: "1px solid rgba(99,102,241,0.2)" }}>
+                <svg className="w-4 h-4" style={{ color: "var(--accent-hover)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                     d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                 </svg>
               </div>
-              <span className="font-semibold text-slate-900">p.secret</span>
+              <span className="font-semibold text-sm" style={{ color: "var(--text)" }}>anla secret</span>
             </div>
 
-            <nav className="flex bg-[var(--ios-surface-alt)] rounded-xl p-1 gap-0.5">
-              <button
-                onClick={() => setTab("vault")}
-                className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  tab === "vault" ? "bg-slate-900 text-white shadow-sm" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                Key Vault
-                <span className={`ml-1.5 text-xs ${tab === "vault" ? "text-slate-400" : "text-slate-400"}`}>
-                  {credentials.length}
-                </span>
-              </button>
-              <button
-                onClick={() => setTab("auth")}
-                className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  tab === "auth" ? "bg-slate-900 text-white shadow-sm" : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                Authenticator
-                <span className={`ml-1.5 text-xs ${tab === "auth" ? "text-slate-400" : "text-slate-400"}`}>
-                  {totpAccounts.length}
-                </span>
-              </button>
+            {/* Tabs */}
+            <nav className="flex rounded-xl p-1 gap-0.5"
+                 style={{ background: "var(--surface)" }}>
+              {(["vault", "auth"] as Tab[]).map((t) => {
+                const active = tab === t;
+                const label = t === "vault" ? "Key Vault" : "Authenticator";
+                const count = t === "vault" ? credentials.length : totpAccounts.length;
+                return (
+                  <button
+                    key={t}
+                    onClick={() => setTab(t)}
+                    className="px-4 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5"
+                    style={{
+                      background: active ? "var(--accent)" : "transparent",
+                      color: active ? "#fff" : "var(--text-secondary)",
+                    }}
+                  >
+                    {label}
+                    <span className="text-xs opacity-60">{count}</span>
+                  </button>
+                );
+              })}
             </nav>
 
             <LogoutButton />
@@ -61,7 +65,8 @@ export default function DashboardClient({ credentials, totpAccounts }: Dashboard
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {tab === "vault" ? (
           <CredentialGrid credentials={credentials} />
         ) : (
