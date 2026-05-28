@@ -14,14 +14,16 @@ export default function OTPGrid({ accounts }: OTPGridProps) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return accounts;
-    return accounts.filter((a) => a.email.toLowerCase().includes(q));
+    return accounts.filter(
+      (a) => a.issuer.toLowerCase().includes(q) || a.name.toLowerCase().includes(q)
+    );
   }, [accounts, query]);
 
   if (accounts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-slate-400">
         <p className="text-sm">No authenticator accounts configured.</p>
-        <p className="text-xs mt-1">Add GMAIL1_USERNAME and GMAIL1_AUTHENTICATOR to .env</p>
+        <p className="text-xs mt-1">Add TOTP_1_SECRET / TOTP_1_NAME / TOTP_1_ISSUER to .env</p>
       </div>
     );
   }
@@ -33,7 +35,7 @@ export default function OTPGrid({ accounts }: OTPGridProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by email..."
+          placeholder="Search by service or account..."
           className="w-full px-4 py-3 bg-[var(--ios-surface)] border border-[var(--ios-border)] rounded-2xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900"
         />
         {query && (
@@ -47,12 +49,7 @@ export default function OTPGrid({ accounts }: OTPGridProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filtered.map((account) => (
-          <OTPCard
-            key={account.email}
-            email={account.email}
-            secret={account.secret}
-            backupCodes={account.backupCodes}
-          />
+          <OTPCard key={`${account.issuer}-${account.name}`} {...account} />
         ))}
       </div>
     </div>

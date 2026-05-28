@@ -5,8 +5,10 @@ export interface JWTPayload {
 }
 
 export interface TOTPAccount {
-  email: string;
+  name: string;
   secret: string;
+  issuer: string;
+  service: ServiceType;
   backupCodes: string[];
 }
 

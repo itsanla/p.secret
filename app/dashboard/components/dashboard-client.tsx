@@ -7,43 +7,14 @@ import OTPGrid from "./otp-grid";
 import CredentialGrid from "./credential-grid";
 
 interface DashboardClientProps {
-  initialCredentials: Credential[];
+  credentials: Credential[];
   totpAccounts: TOTPAccount[];
 }
 
 type Tab = "vault" | "auth";
 
-export default function DashboardClient({ initialCredentials, totpAccounts }: DashboardClientProps) {
+export default function DashboardClient({ credentials, totpAccounts }: DashboardClientProps) {
   const [tab, setTab] = useState<Tab>("vault");
-  const [credentials, setCredentials] = useState<Credential[]>(initialCredentials);
-
-  const handleAdd = async (data: Omit<Credential, "id" | "createdAt" | "updatedAt">) => {
-    const res = await fetch("/api/credentials", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to add");
-    const created: Credential = await res.json();
-    setCredentials((prev) => [created, ...prev]);
-  };
-
-  const handleUpdate = async (id: string, data: Omit<Credential, "id" | "createdAt" | "updatedAt">) => {
-    const res = await fetch(`/api/credentials/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error("Failed to update");
-    const updated: Credential = await res.json();
-    setCredentials((prev) => prev.map((c) => (c.id === id ? updated : c)));
-  };
-
-  const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/credentials/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Failed to delete");
-    setCredentials((prev) => prev.filter((c) => c.id !== id));
-  };
 
   return (
     <div className="min-h-screen text-slate-900">
@@ -60,7 +31,6 @@ export default function DashboardClient({ initialCredentials, totpAccounts }: Da
               <span className="font-semibold text-slate-900">p.secret</span>
             </div>
 
-            {/* Tabs */}
             <nav className="flex bg-[var(--ios-surface-alt)] rounded-xl p-1 gap-0.5">
               <button
                 onClick={() => setTab("vault")}
@@ -69,7 +39,7 @@ export default function DashboardClient({ initialCredentials, totpAccounts }: Da
                 }`}
               >
                 Key Vault
-                <span className={`ml-1.5 text-xs ${tab === "vault" ? "text-slate-300" : "text-slate-400"}`}>
+                <span className={`ml-1.5 text-xs ${tab === "vault" ? "text-slate-400" : "text-slate-400"}`}>
                   {credentials.length}
                 </span>
               </button>
@@ -80,7 +50,7 @@ export default function DashboardClient({ initialCredentials, totpAccounts }: Da
                 }`}
               >
                 Authenticator
-                <span className={`ml-1.5 text-xs ${tab === "auth" ? "text-slate-300" : "text-slate-400"}`}>
+                <span className={`ml-1.5 text-xs ${tab === "auth" ? "text-slate-400" : "text-slate-400"}`}>
                   {totpAccounts.length}
                 </span>
               </button>
@@ -93,12 +63,7 @@ export default function DashboardClient({ initialCredentials, totpAccounts }: Da
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {tab === "vault" ? (
-          <CredentialGrid
-            credentials={credentials}
-            onAdd={handleAdd}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-          />
+          <CredentialGrid credentials={credentials} />
         ) : (
           <OTPGrid accounts={totpAccounts} />
         )}

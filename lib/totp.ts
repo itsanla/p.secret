@@ -1,24 +1,21 @@
-import type { TOTPAccount } from "@/types";
+import type { TOTPAccount, ServiceType } from "@/types";
 
 export function parseTOTPAccounts(): TOTPAccount[] {
-  const accounts: TOTPAccount[] = [];
   const env = process.env;
+  const accounts: TOTPAccount[] = [];
 
   Object.keys(env).forEach((key) => {
-    const match = key.match(/^GMAIL(\d+)_USERNAME$/);
+    const match = key.match(/^TOTP_(\d+)_SECRET$/);
     if (!match) return;
     const n = match[1];
-    const email = env[`GMAIL${n}_USERNAME`] || "";
-    const secret = env[`GMAIL${n}_AUTHENTICATOR`] || "";
-    const codes = env[`GMAIL${n}_BACKUP_CODES`] || "";
-    if (email && secret) {
-      accounts.push({
-        email,
-        secret,
-        backupCodes: codes.split(",").map((c) => c.trim()).filter(Boolean),
-      });
+    const secret = env[`TOTP_${n}_SECRET`] || "";
+    const name = env[`TOTP_${n}_NAME`] || "";
+    const issuer = env[`TOTP_${n}_ISSUER`] || name;
+    const service = (env[`TOTP_${n}_SERVICE`] || "other") as ServiceType;
+    if (secret && name) {
+      accounts.push({ name, secret, issuer, service, backupCodes: [] });
     }
   });
 
-  return accounts.sort((a, b) => a.email.localeCompare(b.email));
+  return accounts;
 }

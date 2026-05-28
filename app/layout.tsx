@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "p.secret",
+  title: "anla secret",
   description: "Personal key vault & authenticator",
 };
 
