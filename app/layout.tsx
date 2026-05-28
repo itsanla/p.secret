@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "secret key anla harpanda",
-  description: "this is secret pages of anla harpanda",
+  title: "p.secret",
+  description: "Personal key vault & authenticator",
 };
 
 export default function RootLayout({
