@@ -13,5 +13,6 @@ export default async function Home() {
     }
   }
 
-  redirect("/login");
+  // Redirect to SSO login flow directly instead of showing local login page
+  redirect("/api/auth/sso");
 }
