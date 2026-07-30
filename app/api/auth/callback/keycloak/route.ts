@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const issuer = process.env.KEYCLOAK_ISSUER || "https://sso.anla.my.id/realms/master";
   const clientId = process.env.KEYCLOAK_CLIENT_ID || "p.secret";
   const clientSecret = process.env.KEYCLOAK_CLIENT_SECRET || "";
-  const redirectUri = `${process.env.NEXTAUTH_URL || "https://secret.anla.my.id"}/api/auth/callback`;
+  const redirectUri = `${process.env.NEXTAUTH_URL || "https://secret.anla.my.id"}/api/auth/callback/keycloak`;
   
   try {
     // Exchange code for token
@@ -55,7 +55,6 @@ export async function GET(request: NextRequest) {
     // Sign our own auth token and log in
     const token = await signToken(username);
     
-    // For redirect, construct URL based on the request URL context
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     response.cookies.set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
