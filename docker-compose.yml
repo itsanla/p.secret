@@ -5,11 +5,22 @@ services:
     build: .
     container_name: psecret-app
     restart: unless-stopped
-    ports:
-      - "3006:3000"
     environment:
       - SQLITE_DB_PATH=/app/data/psecret.sqlite
     env_file:
       - .env
     volumes:
       - /home/anla/backup/p.secret:/app/data
+    networks:
+      - default
+      - coolify
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.psecret-app.rule=Host(`auth.anla.my.id`)"
+      - "traefik.http.routers.psecret-app.tls.certresolver=letsencrypt"
+      - "traefik.http.services.psecret-app.loadbalancer.server.port=3000"
+      - "traefik.docker.network=coolify"
+
+networks:
+  coolify:
+    external: true
