@@ -55,7 +55,9 @@ export async function GET(request: NextRequest) {
     // Sign our own auth token and log in
     const token = await signToken(username);
     
-    const response = NextResponse.redirect(new URL("/dashboard", request.url));
+    // Always use NEXTAUTH_URL for redirect target to prevent local binding URL (0.0.0.0) leak when behind reverse proxy
+    const baseUrl = process.env.NEXTAUTH_URL || "https://secret.anla.my.id";
+    const response = NextResponse.redirect(new URL("/dashboard", baseUrl));
     response.cookies.set(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
