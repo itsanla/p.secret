@@ -16,7 +16,7 @@ services:
       - coolify
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.psecret-app.rule=Host(`auth.anla.my.id`)"
+      - "traefik.http.routers.psecret-app.rule=Host(`secret.anla.my.id`)"
       - "traefik.http.routers.psecret-app.tls.certresolver=letsencrypt"
       - "traefik.http.services.psecret-app.loadbalancer.server.port=3000"
       - "traefik.docker.network=coolify"
