@@ -104,6 +104,22 @@ export default function LoginPage() {
                 </span>
               ) : "Sign In"}
             </button>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[var(--border)]"></div>
+              </div>
+              <span className="relative px-3 text-xs bg-[var(--surface)] text-[var(--text-muted)]">or</span>
+            </div>
+
+            {/* SSO Button */}
+            <a
+              href="/api/auth/sso"
+              className="w-full py-3 rounded-2xl text-sm font-semibold text-center block transition-all border border-[var(--border)] bg-[var(--surface-alt)] hover:bg-[var(--surface-hover)] text-[var(--text-secondary)]"
+            >
+              Sign In with SSO (Keycloak)
+            </a>
           </form>
         </div>
 
