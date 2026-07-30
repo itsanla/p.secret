@@ -11,11 +11,11 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Copy package files
 COPY package.json pnpm-lock.yaml .npmrc* ./
 
-# Install dependencies
-RUN pnpm i --frozen-lockfile
+# Install dependencies with ignore-scripts to prevent build failures during installation
+RUN pnpm i --frozen-lockfile --ignore-scripts
 
-# Rebuild better-sqlite3 specifically if needed
-RUN cd node_modules/better-sqlite3 && node-gyp rebuild
+# Rebuild better-sqlite3 specifically using node-gyp
+RUN cd node_modules/better-sqlite3 && npx node-gyp rebuild
 
 # Rebuild Runner
 FROM base AS builder
