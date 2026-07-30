@@ -20,11 +20,15 @@ const SERVICE_STYLE: Record<string, { badge: string; ring: string; initial: stri
 
 interface CredentialCardProps {
   credential: Credential;
+  onEdit: (c: Credential) => void;
+  onDelete: (id: string) => Promise<void>;
 }
 
-export default function CredentialCard({ credential }: CredentialCardProps) {
+export default function CredentialCard({ credential, onEdit, onDelete }: CredentialCardProps) {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const style = SERVICE_STYLE[credential.service] ?? SERVICE_STYLE.other;
 
@@ -32,6 +36,22 @@ export default function CredentialCard({ credential }: CredentialCardProps) {
     await navigator.clipboard.writeText(credential.value);
     setCopied(true);
     setTimeout(() => setCopied(false), 1800);
+  };
+
+  const handleDeleteClick = async () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      setTimeout(() => setConfirmDelete(false), 3000);
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      await onDelete(credential.id);
+    } catch (err) {
+      console.error(err);
+      setIsDeleting(false);
+      setConfirmDelete(false);
+    }
   };
 
   const isLong = credential.value.length > 80;
@@ -60,6 +80,41 @@ export default function CredentialCard({ credential }: CredentialCardProps) {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Action icons */}
+        <div className="flex gap-1 shrink-0">
+          <button
+            onClick={() => onEdit(credential)}
+            className="p-1.5 rounded-lg hover:bg-[var(--surface-hover)] text-slate-400 hover:text-slate-200 transition-colors"
+            title="Edit"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+          </button>
+          
+          <button
+            onClick={handleDeleteClick}
+            className={`p-1.5 rounded-lg transition-colors ${confirmDelete ? "bg-rose-500/20 text-rose-400" : "hover:bg-rose-500/10 text-slate-400 hover:text-rose-400"}`}
+            title={confirmDelete ? "Click again to confirm delete" : "Delete"}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : confirmDelete ? (
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 

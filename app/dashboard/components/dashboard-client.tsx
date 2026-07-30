@@ -15,6 +15,58 @@ type Tab = "vault" | "auth";
 
 export default function DashboardClient({ credentials, totpAccounts }: DashboardClientProps) {
   const [tab, setTab] = useState<Tab>("vault");
+  const [creds, setCreds] = useState<Credential[]>(credentials);
+
+  const handleAdd = async (data: Omit<Credential, "id" | "createdAt" | "updatedAt">) => {
+    try {
+      const res = await fetch("/api/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to add credential");
+      const created = await res.json();
+      setCreds((c) => [created, ...c]);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const handleUpdate = async (id: string, data: Omit<Credential, "id" | "createdAt" | "updatedAt">) => {
+    try {
+      const res = await fetch(`/api/credentials/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to update credential");
+      
+      setCreds((c) =>
+        c.map((item) =>
+          item.id === id
+            ? { ...item, ...data, updatedAt: Date.now() }
+            : item
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch(`/api/credentials/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete credential");
+      setCreds((c) => c.filter((item) => item.id !== id));
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -42,7 +94,7 @@ export default function DashboardClient({ credentials, totpAccounts }: Dashboard
               {(["vault", "auth"] as Tab[]).map((t) => {
                 const active = tab === t;
                 const label = t === "vault" ? "Key Vault" : "Authenticator";
-                const count = t === "vault" ? credentials.length : totpAccounts.length;
+                const count = t === "vault" ? creds.length : totpAccounts.length;
                 return (
                   <button
                     key={t}
@@ -68,7 +120,12 @@ export default function DashboardClient({ credentials, totpAccounts }: Dashboard
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {tab === "vault" ? (
-          <CredentialGrid credentials={credentials} />
+          <CredentialGrid
+            credentials={creds}
+            onAdd={handleAdd}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+          />
         ) : (
           <OTPGrid accounts={totpAccounts} />
         )}
