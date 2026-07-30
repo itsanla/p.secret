@@ -23,6 +23,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Ensure public directory exists to prevent build failures during copy stage
+RUN mkdir -p public
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED=1
